@@ -4,6 +4,6 @@ ADD requirements.txt requirements.txt
 RUN pip install -r requirements.txt
 # COPY app.py app.py
 COPY utils utils
-COPY file_uploader.py file_uploader.py
-CMD ["python", "-u", "file_uploader.py"]
+COPY main.py main.py
+CMD ["python", "-u", "main.py"]
 # CMD ["python", "-u", "app.py"]

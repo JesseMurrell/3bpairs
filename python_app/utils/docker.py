@@ -1,10 +1,8 @@
 import os
-import logging
 
 import pandas as pd
 from sqlalchemy import create_engine
 
-logger = logging.getLogger(__name__)
 
 def get_postgres_env_credentials() -> dict:
     """
@@ -20,6 +18,7 @@ def get_postgres_env_credentials() -> dict:
         'port' : os.environ['POSTGRES_PORT'],
     }
     return credentials
+
 
 def generate_postgres_connection_str(
     credentials : str = None ) -> str:
@@ -41,6 +40,7 @@ def generate_postgres_connection_str(
 
     return connection_str
 
+
 def write_dataframe_to_postgres(
     dataframe : pd.DataFrame,
     table_name : str,
@@ -60,13 +60,9 @@ def write_dataframe_to_postgres(
     :return: Confirmation upload was made succesfully.
     """
 
-    logger.info('Creating Connection String')
     postgress_connection = generate_postgres_connection_str()
-    logger.info('Making connection to database')
     postgress_connection_str = generate_postgres_connection_str()
     engine = create_engine(postgress_connection_str)
-    logger.info(f'Connection made. Uploading dataframe as {table_name} table')
     dataframe.to_sql(table_name, engine, if_exists='replace',index_label='id')
-    logger.info(f'Table {table_name} uploaded.')
     
     return 'Success! Upload Complete.'

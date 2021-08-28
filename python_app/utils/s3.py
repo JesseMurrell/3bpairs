@@ -3,6 +3,7 @@ import re
 import boto3
 from tqdm import tqdm
 
+
 def get_s3_path_components(
     full_s3_url : str) -> dict:
     """
@@ -26,8 +27,6 @@ def get_s3_path_components(
         s3_bucket_path = re.search(
             regex_bucket_path_pattern, full_s3_url)[1]
     except TypeError:
-        logger.info("No bucket path detected. Set returned dict key 'path' \
-        as {'path' : None}.")
         s3_bucket_path = None
 
     try:
@@ -38,8 +37,6 @@ def get_s3_path_components(
         if '.' not in s3_file_name:
             s3_file_name = None
     except TypeError:
-        logger.info("No bucket file detected. Set returned dict key 'file' \
-        as {'file' : None}.")
         s3_file_name = None
 
     s3_path_structure = {
@@ -49,12 +46,14 @@ def get_s3_path_components(
     }
     return s3_path_structure
 
+
 def compose_full_s3_url(
     bucket_name : str,
     bucket_path : str) -> str:
 
     full_s3_path = 's3://' + bucket_name + '/' + bucket_path
     return full_s3_path
+
 
 def list_s3_path_files(
     full_s3_url : str,
@@ -147,7 +146,10 @@ def download_list_of_files_from_s3(
     :return : List of the path to each file saved.
     """
     files_saved = []
-    for s3_path in tqdm(s3_file_paths_list):
+    for num, s3_path in enumerate(s3_file_paths_list):
+        if num%50 == 0 and num != 0:
+            print(f'{num} of {len(s3_file_paths_list)} complete')
+
         path_components = get_s3_path_components(s3_path)
         bucket_name = path_components['bucket']
         bucket_path = path_components['path']
@@ -163,7 +165,8 @@ def download_list_of_files_from_s3(
             s3_client
         )
         files_saved.append(local_save_path)
-
+    
+    print('Download Complete')
     return files_saved
 
 
