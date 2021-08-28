@@ -1,0 +1,39 @@
+version: "3"
+services:
+
+  postgres_db:
+    image: postgres:11
+    environment:   # Set up postgres database name and password
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+    ports:    # Set up ports exposed for other containers to connect to
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+    # networks:
+    #   - app-tier
+    volumes:
+      - ./postgres:/docker-entrypoint-initdb.d
+
+  python_app:
+    image: python:3.8
+    build: 
+      context: ./python_app/
+      dockerfile: Dockerfile
+    environment:
+      -  POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      -  POSTGRES_DB=${POSTGRES_DB}
+      -  POSTGRES_USER=${POSTGRES_USER}
+      -  POSTGRES_PORT=${POSTGRES_PORT}
+      -  POSTGRES_HOST=${POSTGRES_HOST}
+      -  IMAGE_SAMPLE_SIZE=${IMAGE_SAMPLE_SIZE}
+      -  IMAGES_S3_LOCATION=${IMAGES_S3_LOCATION}
+    depends_on:
+      - postgres_db
+    # networks:
+    #   - app-tier
+    # command:
+    #   tail -f /dev/null
+
+# networks:
+#   app-tier:
+#     driver: bridge
