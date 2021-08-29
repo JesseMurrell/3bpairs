@@ -6,4 +6,3 @@ RUN pip install -r requirements.txt
 COPY utils utils
 COPY main.py main.py
 CMD ["python", "-u", "main.py"]
-# CMD ["python", "-u", "app.py"]

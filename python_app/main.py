@@ -1,4 +1,5 @@
 import os
+import re
 
 import boto3 
 from botocore import UNSIGNED
@@ -9,7 +10,6 @@ from utils.docker import (
     write_dataframe_to_postgres, generate_postgres_connection_str)
 
 print(f'Beginning postgres database population')
-
 mnist_images_s3_path = os.environ['IMAGES_S3_LOCATION']
 image_sample_size = int(os.environ['IMAGE_SAMPLE_SIZE'])
 table_name = os.environ['POSTGRES_TABLE_NAME']
@@ -27,5 +27,7 @@ images_dataframe = build_image_db_entries(
 print('Dataset generated. Populating database')
 write_dataframe_to_postgres(images_dataframe, table_name)
 
+query_url = generate_postgres_connection_str()
+query_url = re.sub('postgres_db', 'localhost', query_url)
 print(f'Database populated, access via\n\
-$ psql {generate_postgres_connection_str()}')
+$ psql {query_url}')

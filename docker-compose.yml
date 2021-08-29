@@ -1,6 +1,5 @@
 version: "3"
 services:
-
   postgres_db:
     image: postgres:11
     environment:   # Set up postgres database name and password
@@ -30,6 +29,8 @@ services:
       -  IMAGES_S3_LOCATION=${IMAGES_S3_LOCATION}
     depends_on:
       - postgres_db
+    container_name: 
+      ${CONTAINER_NAME}
     # networks:
     #   - app-tier
     # command:

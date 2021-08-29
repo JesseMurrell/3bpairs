@@ -31,6 +31,7 @@ def translate_image_mode(
     mode_as_text = image_mode_key[mode.upper()]
     return mode_as_text
 
+
 def get_image_matrix(
     image_path : str ) -> np.ndarray:
     """
@@ -45,9 +46,18 @@ def get_image_matrix(
 
     return image_array
 
+
 def get_image_data(
     image_path : str) -> dict:
+    """
+    Builds a dictionary of data on an image from a specified local image path.
+    
+    :param image_path: Local image path.
 
+    :return : Dict of information of the image. Fields [
+        'pixel_array', 'shape' ,'mode' 'size_x', 'size_y'
+    ]
+    """
     image = Image.open(image_path)
     image_array = np.asarray(image)
     image_mode = translate_image_mode(image.mode)
@@ -56,7 +66,7 @@ def get_image_data(
     image_shape = image_array.shape
 
     image_data = {
-        # 'px_matrix' : image_array,
+        'pixel_array' : image_array,
         'shape' : image_shape,
         'mode' : image_mode,
         'size_x' : image_size_x,
@@ -65,10 +75,19 @@ def get_image_data(
 
     return image_data
 
+
 def get_s3_image_data(
     local_image_path : str,
     s3_image_path : str ,
     image_upload_date : datetime.datetime) -> dict:
+    """
+    Builds a dictionary of data on a specified image that is being stored 
+    locally but has been downloaded from AWS s3.
+
+    :param local_image_path: Where image is stored in the local directory.
+    :param s3_image_path: Where the image has been downloaded from is AWS s3.
+    :image_upload_date : The date an image was uploaded to AWS s3.
+    """
 
     image_name = local_image_path.split('/')[-1]
     image_title = image_name.split('.')[0]
@@ -78,19 +97,20 @@ def get_s3_image_data(
     time_now = datetime.datetime.now()
     image_data['label'] = image_label
     image_data['title'] = image_title
-    image_data['local_path'] = local_image_path
+    # image_data['local_path'] = local_image_path
     image_data['s3_path'] = s3_image_path
     image_data['image_format'] = image_format
     image_data['s3_upload_date'] = image_upload_date
     image_data['date_added_to_db'] = time_now
 
-    
     return image_data
+
 
 def build_image_db_entries(
         s3_full_url : str,
         image_sample_size : int,
         s3_client : boto3.client('s3')) -> pd.DataFrame:
+    
 
     s3_bucket_items = list_s3_path_files(
         s3_full_url,
@@ -124,5 +144,10 @@ def build_image_db_entries(
         sample_image_data.append(image_item_data)
 
     images_dataframe = pd.DataFrame(sample_image_data) 
+    # make array sqlachemy safe
+    array_replacements = {'{' : '[', '}' : ']'}
+    translation_dict = str.maketrans(array_replacements)
+    images_dataframe['pixel_array'] = images_dataframe.pixel_array.apply(
+        lambda x : str(x.tolist()).translate(translation_dict))
 
     return images_dataframe

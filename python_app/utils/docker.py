@@ -1,8 +1,9 @@
 import os
 
 import pandas as pd
+from sqlalchemy import types
 from sqlalchemy import create_engine
-
+from sqlalchemy.dialects import postgresql
 
 def get_postgres_env_credentials() -> dict:
     """
@@ -44,7 +45,7 @@ def generate_postgres_connection_str(
 def write_dataframe_to_postgres(
     dataframe : pd.DataFrame,
     table_name : str,
-    credentials : str = None) -> str:
+    credentials : str = None):
     """
     Writes a pandas dataframe to a postgres database table.
     
@@ -57,12 +58,15 @@ def write_dataframe_to_postgres(
         'user','password','host','post','database'
     ]
 
-    :return: Confirmation upload was made succesfully.
+    :return: None
     """
 
     postgress_connection = generate_postgres_connection_str()
     postgress_connection_str = generate_postgres_connection_str()
     engine = create_engine(postgress_connection_str)
-    dataframe.to_sql(table_name, engine, if_exists='replace',index_label='id')
-    
-    return 'Success! Upload Complete.'
+    dataframe.to_sql(
+        table_name,
+        engine,
+        if_exists='replace',
+        index_label='id'
+    )
