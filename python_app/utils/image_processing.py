@@ -100,7 +100,7 @@ def get_s3_image_data(
     # image_data['local_path'] = local_image_path
     image_data['s3_path'] = s3_image_path
     image_data['image_format'] = image_format
-    image_data['s3_upload_date'] = image_upload_date
+    image_data['s3_upload_date'] = image_upload_date.replace(tzinfo=None)
     image_data['date_added_to_db'] = time_now
 
     return image_data
@@ -159,4 +159,5 @@ def build_image_db_entries(
     images_dataframe['pixel_array'] = images_dataframe.pixel_array.apply(
         lambda x : str(x.tolist()).translate(translation_dict))
 
+    print(images_dataframe.columns)
     return images_dataframe
