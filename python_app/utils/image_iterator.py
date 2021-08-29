@@ -4,16 +4,27 @@
 import os
 import re
 import ast
+from collections.abc import Iterable
 
 import psycopg2
 import numpy as np
 import pandas as pd
-from utils.docker import get_postgres_env_credentials
+
 from utils.image_processing import get_image_matrix
+from utils.docker import get_postgres_env_credentials
+
 
 def postgres_db_to_dataframe(
-    table_name : str = os.environ['POSTGRES_TABLE_NAME']):
+    table_name : str = os.environ['POSTGRES_TABLE_NAME']) -> pd.DataFrame:
+    """
+    Queries a docker postgres image defined in the enviromental variables 
+    and returns a pandas DataFrame of the data.csv
 
+    :param table_name: The postgres table to be queried and returned as a 
+    dataframe.
+
+    :return pd.DataFrame: Postgres query as DataFrame.
+    """
     credentials = get_postgres_env_credentials()
     
     try:
@@ -33,17 +44,18 @@ def postgres_db_to_dataframe(
 
     return progress_df
 
-def format_postgres_array(
-    postgres_formatted_array):
 
-    array_replace_bracket_1 = re.sub('{','[',postgres_formatted_array)
-    array_replace_all_brackets = re.sub('}',']',array_replace_bracket_1)
-    formatted_array = ast.literal_eval(array_replace_all_brackets)
+def get_random_images(
+    response_item_type : str = 'pixel_array') -> Iterable:
+    """
+    Generator function to iterate over image data hosted in docker postgres
+    container. Credentials are pulled from environmental variables.
 
-    return formatted_array
-
-def image_sample_iterator(
-    response_item_type : str = 'pixel_array') -> 'Generator[np.ndarray]':
+    :param response_item_type: The type of object that is returned by the
+    function. Defaults to 'pixel_array' which returns the pixel matrix from 
+    the image. Alternate arg is 'all_data' which returns all row data on the 
+    image from the database as a dict. 
+    """
 
     image_sample_df = postgres_db_to_dataframe()
 
@@ -62,7 +74,3 @@ def image_sample_iterator(
         else:
             raise ValueError("Please specift a valid response_item_type. Valid\
                 args: ['pixel_array', 'all_data']")
-        
-image_iterator = image_sample_iterator()
-
-# from utils.image_iterator import image_iterator

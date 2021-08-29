@@ -39,7 +39,7 @@ def get_image_matrix(
 
     :param image_path: Local path to input images
 
-    :return : np.ndarray
+    :return np.ndarray: Image pixel matrix as a an array.
     """
     image = Image.open(image_path)
     image_array = np.asarray(image)
@@ -54,7 +54,7 @@ def get_image_data(
     
     :param image_path: Local image path.
 
-    :return : Dict of information of the image. Fields [
+    :return dict : Dictionary of information of the image. Fields [
         'pixel_array', 'shape' ,'mode' 'size_x', 'size_y'
     ]
     """
@@ -110,8 +110,17 @@ def build_image_db_entries(
         s3_full_url : str,
         image_sample_size : int,
         s3_client : boto3.client('s3')) -> pd.DataFrame:
-    
+    """
+    Creates a pandas dataframe from a random sample of images stored in AWS s3. 
 
+    :param s3_full_url: Directory of the image filses in s3.
+    :param image_sample_size: The number images to be included included in the
+    dataframes random sample.
+    :param s3_client: Active s3 client object.
+
+    :return pd.DataFrame: Pandas dataframe of data from images pulled from AWS
+    s3.
+    """
     s3_bucket_items = list_s3_path_files(
         s3_full_url,
         return_last_modified = True,
