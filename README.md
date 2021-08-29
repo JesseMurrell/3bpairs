@@ -63,7 +63,10 @@ From within the python image you can iterate through the medical image sample th
 ```
 Note* the .env file must be imported into your python image/environment. Also, if you are unable to run the python image as shown above you may need to replace the `python:3.8` section in the snippet with the image id.
 
+The `get_random_images` function takes a single argument, `response_item_type ='pixel_array'` by default. There is also another valid value for  response_item_type,`response_item_type ='all_data'`. 
 
+* `response_item_type ='pixel_array' : Yields a matrix as a python array of the pixels for the current iteration image.
+* `response_item_type ='all_data' : Returns all data for the current interation image as a dict, dict include 'pixel_array' as a key.
 
 ## Authors
 
