@@ -106,7 +106,7 @@ def get_s3_image_data(
     return image_data
 
 
-def build_image_db_entries(
+def build_image_db_schema(
         s3_full_url : str,
         image_sample_size : int,
         s3_client : boto3.client('s3')) -> pd.DataFrame:

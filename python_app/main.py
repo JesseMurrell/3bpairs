@@ -5,7 +5,7 @@ import boto3
 from botocore import UNSIGNED
 from botocore.client import Config
 
-from utils.image_processing import build_image_db_entries
+from utils.image_processing import build_image_db_schema
 from utils.docker import (
     write_dataframe_to_postgres, generate_postgres_connection_str)
 
@@ -19,7 +19,7 @@ anonymous_s3_client = boto3.client(
     config=Config(signature_version=UNSIGNED))
 
 print('Building image dataset...')
-images_dataframe = build_image_db_entries(
+images_dataframe = build_image_db_schema(
     s3_full_url=mnist_images_s3_path,
     image_sample_size = image_sample_size,
     s3_client=anonymous_s3_client)

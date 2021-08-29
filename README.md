@@ -15,13 +15,34 @@ Docker Compose (May need to install separately to Docker depending on system) - 
 ### Set Up
 The container is built using the [`docker-compose.yaml`](https://github.com/JesseMurrell/3bpairs/blob/main/docker-compose.yml) file. The file pulls the a lot of it's set up from a `.env` file stored in the root directory. I have included an example `.env` file in the root directory to get you started but feel free to modify as required.
 
-Note* If you have postgres instances running on port 5432 you may need to modify the `POSTGRES_PORT` variable in your `.env` file.
+>Note* If you have postgres instances running on port 5432 you may need to modify the `POSTGRES_PORT` variable in your `.env` file.
 
 
 ### Running
 The Docker Environment is composed of two images:
 
 * Postgres: A PostgresSQL 11 database is used to store the data for querying and iteration via python. 
+
+>Table Schema 
+```
+   column_name    |          data_type          
+------------------+-----------------------------
+ id               | bigint
+ pixel_array      | text
+ shape            | text
+ mode             | text
+ size_x           | bigint
+ size_y           | bigint
+ label            | text
+ title            | text
+ s3_path          | text
+ image_format     | text
+ s3_upload_date   | timestamp without time zone
+ date_added_to_db | timestamp without time zone
+
+```
+
+>The schema is defined and enforced by python and the pixel_array field is cast back to an array when iterating in python.
 
 * Python: Python3.8 image used for processing and exploration. The medical images from [https://www.kaggle.com/andrewmvd/medical-mnist](https://www.kaggle.com/andrewmvd/medical-mnist) are stored in AWS S3. The medical images & their metadata are pulled from S3 via python and written into the postgres database.
 
@@ -61,7 +82,7 @@ From within the python image you can iterate through the medical image sample th
     >>> print(next(image_iterator))
     # image array
 ```
-Note* the .env file must be imported into your python image/environment. Also, if you are unable to run the python image as shown above you may need to replace the `python:3.8` section in the snippet with the image id.
+>Note* the .env file must be imported into your python image/environment. Also, if you are unable to run the python image as shown above you may need to replace the `python:3.8` section in the snippet with the image id.
 
 The `get_random_images` function takes a single argument, `response_item_type ='pixel_array'` by default. There is also another valid value for  response_item_type,`response_item_type ='all_data'`. 
 
